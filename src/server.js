@@ -1,12 +1,26 @@
-import express from "express"; import dotenv from "dotenv";//import express from "express"; its lod .env file
+import express from "express";
+import "dotenv/config";
 import { connectDB, disconnectDB } from "./config/db.js";
 
-dotenv.config();
-connectDB();
+//Import Routes
+import mosqueRoutes from "./routes/mosque.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 
+connectDB();
 const app = express();
 
+
+
+// Body parsing middlwares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+
+// API Routes
+app.use("/api/mosques",mosqueRoutes);
+app.use("/api/auth",authRoutes);
+
 
 const PORT = process.env.PORT || 3000;
 

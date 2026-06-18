@@ -27,6 +27,7 @@ model User {
   createdAt  DateTime     @default(now())
 
 
+  mosques    Mosque[]
   questions  Question[] 
   answers    Answer[] 
 
@@ -45,6 +46,9 @@ model Mosque {
   latitude   Float? 
 
   longitude  Float?
+
+  userId     String
+  user       User    @relation(fields: [userId], references: [id])
 
   maktabs    Maktab[] 
   events     Event[]

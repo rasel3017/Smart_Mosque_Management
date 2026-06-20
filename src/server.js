@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.routes.js";
 import mosqueRoutes from "./routes/mosque.routes.js";
 import maktabRoutes from "./routes/maktab.routes.js";
 import eventRoutes  from "./routes/event.routes.js";
+import qaRoutes  from "./routes/qa.routes.js";
 
 connectDB();
 const app = express();
@@ -24,6 +25,7 @@ app.use("/api/auth",authRoutes);
 app.use("/api/mosques",mosqueRoutes);
 app.use("/api/maktabs", maktabRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/qa", qaRoutes );
 
 const PORT = process.env.PORT || 3000;
 

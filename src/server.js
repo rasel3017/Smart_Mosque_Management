@@ -3,8 +3,9 @@ import "dotenv/config";
 import { connectDB, disconnectDB } from "./config/db.js";
 
 //Import Routes
-import mosqueRoutes from "./routes/mosque.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import mosqueRoutes from "./routes/mosque.routes.js";
+import maktabRoutes from "./routes/maktab.routes.js";
 
 connectDB();
 const app = express();
@@ -18,8 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // API Routes
-app.use("/api/mosques",mosqueRoutes);
 app.use("/api/auth",authRoutes);
+app.use("/api/mosques",mosqueRoutes);
+app.use("/api/maktabs", maktabRoutes);
 
 
 const PORT = process.env.PORT || 3000;

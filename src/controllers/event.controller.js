@@ -3,17 +3,20 @@ import { prisma } from "../config/db.js";
 // Create event
 export const createEvent = async (req, res) => {
   try {
-    const { title, topic, speaker, eventDate, eventTime, mosqueId } = req.body;
+    const { title, topic, speaker, eventDate, eventTime, location, description, imageUrl, isFree, mosqueId, maktabId } = req.body;
 
-    const mosque = await prisma.mosque.findUnique({
-      where: { id: mosqueId },
-    });
+    if (mosqueId) {
+      const mosque = await prisma.mosque.findUnique({ where: { id: mosqueId } });
+      if (!mosque) {
+        return res.status(404).json({ success: false, message: "Mosque not found" });
+      }
+    }
 
-    if (!mosque) {
-      return res.status(404).json({
-        success: false,
-        message: "Mosque not found",
-      });
+    if (maktabId) {
+      const maktab = await prisma.maktab.findUnique({ where: { id: maktabId } });
+      if (!maktab) {
+        return res.status(404).json({ success: false, message: "Maktab not found" });
+      }
     }
 
     const event = await prisma.event.create({
@@ -23,7 +26,12 @@ export const createEvent = async (req, res) => {
         speaker,
         eventDate: new Date(eventDate),
         eventTime,
+        location,
+        description,
+        imageUrl,
+        isFree: isFree !== undefined ? isFree : true,
         mosqueId,
+        maktabId,
       },
     });
 
@@ -39,6 +47,7 @@ export const createEvent = async (req, res) => {
     });
   }
 };
+
 
 // Get events by region
 export const getEventsByRegion = async (req, res) => {

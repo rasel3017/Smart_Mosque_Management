@@ -18,7 +18,14 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve frontend
+import { fileURLToPath } from "url";
+import path from "path";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(path.join(__dirname, "../public")));
 
 // API Routes
 app.use("/api/auth",authRoutes);

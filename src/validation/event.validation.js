@@ -6,10 +6,10 @@ export const validateCreateEvent = (req, res, next) => {
   const eventTime = req.body?.eventTime;
   const mosqueId = req.body?.mosqueId;
 
-  if (!title || !topic || !speaker || !eventDate || !eventTime || !mosqueId) {
+  if (!title || !topic || !speaker || !eventDate || !eventTime) {
     return res.status(400).json({
       success: false,
-      message: "Title, topic, speaker, eventDate, eventTime and mosqueId are required",
+      message: "Title, topic, speaker, eventDate and eventTime are required",
     });
   }
 

@@ -5,10 +5,10 @@ export const validateAddMaktab = (req, res, next) => {
   const totalSeats = req.body?.totalSeats;
   const mosqueId = req.body?.mosqueId;
 
-  if (!name || !teacherName || !teacherPhone || !totalSeats || !mosqueId) {
+  if (!name || !teacherName || !teacherPhone || !totalSeats ) {
     return res.status(400).json({
       success: false,
-      message: "Name, teacherName, teacherPhone, totalSeats and mosqueId are required",
+      message: "Name, teacherName, teacherPhone and totalSeats are required",
     });
   }
 

@@ -35,7 +35,11 @@ export const getMosquesByRegion = async (req, res) => {
     const { region } = req.params;
 
     const mosques = await prisma.mosque.findMany({
-      where: { region },
+      where: { 
+        region: {
+          contains: region,
+          mode: "insensitive"
+        } },
     });
 
     res.status(200).json({

@@ -55,104 +55,159 @@ async function main() {
 
   // Create mosques
   const mosque1 = await prisma.mosque.upsert({
-    where: { id: "seed-mosque-001" },
-    update: {},
-    create: {
-      id: "seed-mosque-001",
-      name: "Baitul Mukarram",
-      address: "Topkhana Road, Dhaka",
-      region: "Dhaka",
-      latitude: 23.7275,
-      longitude: 90.4099,
-      userId: admin.id,
-    },
-  });
+  where: { id: "seed-mosque-001" },
+  update: {},
+  create: {
+    id: "seed-mosque-001",
+    name: "Baitul Mukarram",
+    address: "Topkhana Road, Dhaka",
+    region: "Dhaka",
+    latitude: 23.7275,
+    longitude: 90.4099,
+    imamName: "Maulana Muhammad Salahuddin",
+    muazzinName: "Hafez Abdul Karim",
+    imageUrl: "images/mosque1.jpg",
+    fajrTime: "4:30 AM",
+    zuhrTime: "12:15 PM",
+    asrTime: "4:45 PM",
+    maghribTime: "6:45 PM",
+    ishaTime: "8:00 PM",
+    userId: admin.id,
+  },
+});
 
-  const mosque2 = await prisma.mosque.upsert({
-    where: { id: "seed-mosque-002" },
-    update: {},
-    create: {
-      id: "seed-mosque-002",
-      name: "Star Mosque",
-      address: "Armanitola, Old Dhaka",
-      region: "Dhaka",
-      latitude: 23.7104,
-      longitude: 90.4074,
-      userId: admin.id,
-    },
-  });
+const mosque2 = await prisma.mosque.upsert({
+  where: { id: "seed-mosque-002" },
+  update: {},
+  create: {
+    id: "seed-mosque-002",
+    name: "Star Mosque",
+    address: "Armanitola, Old Dhaka",
+    region: "Dhaka",
+    latitude: 23.7104,
+    longitude: 90.4074,
+    imamName: "Maulana Ibrahim Khalil",
+    muazzinName: "Hafez Yusuf Ali",
+    imageUrl: "images/mosque2.jpg",
+    fajrTime: "4:30 AM",
+    zuhrTime: "12:15 PM",
+    asrTime: "4:45 PM",
+    maghribTime: "6:45 PM",
+    ishaTime: "8:00 PM",
+    userId: admin.id,
+  },
+});
 
-  const mosque3 = await prisma.mosque.upsert({
-    where: { id: "seed-mosque-003" },
-    update: {},
-    create: {
-      id: "seed-mosque-003",
-      name: "Shahi Jame Mosque",
-      address: "Rajshahi City",
-      region: "Rajshahi",
-      latitude: 24.3745,
-      longitude: 88.6042,
-      userId: admin.id,
-    },
-  });
+const mosque3 = await prisma.mosque.upsert({
+  where: { id: "seed-mosque-003" },
+  update: {},
+  create: {
+    id: "seed-mosque-003",
+    name: "Shahi Jame Mosque",
+    address: "Rajshahi City",
+    region: "Rajshahi",
+    latitude: 24.3745,
+    longitude: 88.6042,
+    imamName: "Maulana Abdul Aziz",
+    muazzinName: "Hafez Omar Faruk",
+    imageUrl: "images/mosque3.jpg",
+    fajrTime: "4:25 AM",
+    zuhrTime: "12:10 PM",
+    asrTime: "4:40 PM",
+    maghribTime: "6:40 PM",
+    ishaTime: "7:55 PM",
+    userId: admin.id,
+  },
+});
 
-  const mosque4 = await prisma.mosque.upsert({
-    where: { id: "seed-mosque-004" },
-    update: {},
-    create: {
-      id: "seed-mosque-004",
-      name: "Sixty Dome Mosque",
-      address: "Bagerhat",
-      region: "Khulna",
-      latitude: 22.6602,
-      longitude: 89.7304,
-      userId: admin.id,
-    },
-  });
+const mosque4 = await prisma.mosque.upsert({
+  where: { id: "seed-mosque-004" },
+  update: {},
+  create: {
+    id: "seed-mosque-004",
+    name: "Sixty Dome Mosque",
+    address: "Bagerhat",
+    region: "Khulna",
+    latitude: 22.6602,
+    longitude: 89.7304,
+    imamName: "Maulana Hafezur Rahman",
+    muazzinName: "Hafez Abdullah",
+    imageUrl: "images/mosque4.jpg",
+    fajrTime: "4:35 AM",
+    zuhrTime: "12:20 PM",
+    asrTime: "4:50 PM",
+    maghribTime: "6:50 PM",
+    ishaTime: "8:05 PM",
+    userId: admin.id,
+  },
+});
 
-  console.log("Mosques created");
 
   // Create maktabs
   const maktab1 = await prisma.maktab.upsert({
-    where: { id: "seed-maktab-001" },
-    update: {},
-    create: {
-      id: "seed-maktab-001",
-      name: "Baitul Mukarram Maktab",
-      teacherName: "Maulana Abdul Karim",
-      teacherPhone: "01712345678",
-      totalSeats: 50,
-      mosqueId: mosque1.id,
-    },
-  });
+  where: { id: "seed-maktab-001" },
+  update: {},
+  create: {
+    id: "seed-maktab-001",
+    name: "Baitul Mukarram Maktab",
+    address: "Topkhana Road, Dhaka",
+    teacherName: "Maulana Abdul Karim",
+    teacherPhone: "01712345678",
+    totalSeats: 50,
+    coursesOffered: "Quran Recitation, Tajweed, Islamic Studies, Arabic Language",
+    imageUrl: "images/quran1.jpg",
+    mosqueId: mosque1.id,
+  },
+});
 
-  const maktab2 = await prisma.maktab.upsert({
-    where: { id: "seed-maktab-002" },
-    update: {},
-    create: {
-      id: "seed-maktab-002",
-      name: "Star Mosque Maktab",
-      teacherName: "Maulana Ibrahim",
-      teacherPhone: "01812345678",
-      totalSeats: 30,
-      mosqueId: mosque2.id,
-    },
-  });
+const maktab2 = await prisma.maktab.upsert({
+  where: { id: "seed-maktab-002" },
+  update: {},
+  create: {
+    id: "seed-maktab-002",
+    name: "Star Mosque Maktab",
+    address: "Armanitola, Old Dhaka",
+    teacherName: "Maulana Ibrahim",
+    teacherPhone: "01812345678",
+    totalSeats: 30,
+    coursesOffered: "Quran Memorization, Hadith, Fiqh",
+    imageUrl: "images/quran2.jpg",
+    mosqueId: mosque2.id,
+  },
+});
 
-  const maktab3 = await prisma.maktab.upsert({
-    where: { id: "seed-maktab-003" },
-    update: {},
-    create: {
-      id: "seed-maktab-003",
-      name: "Rajshahi Central Maktab",
-      teacherName: "Maulana Yusuf",
-      teacherPhone: "01912345678",
-      totalSeats: 40,
-      mosqueId: mosque3.id,
-    },
-  });
+const maktab3 = await prisma.maktab.upsert({
+  where: { id: "seed-maktab-003" },
+  update: {},
+  create: {
+    id: "seed-maktab-003",
+    name: "Rajshahi Central Maktab",
+    address: "Rajshahi City Center",
+    teacherName: "Maulana Yusuf",
+    teacherPhone: "01912345678",
+    totalSeats: 40,
+    coursesOffered: "Quran Recitation, Arabic Language, Islamic History",
+    imageUrl: "images/quran3.jpg",
+    mosqueId: mosque3.id,
+  },
+});
 
-  console.log("Maktabs created");
+const maktab4 = await prisma.maktab.upsert({
+  where: { id: "seed-maktab-004" },
+  update: {},
+  create: {
+    id: "seed-maktab-004",
+    name: "Independent Darul Quran",
+    address: "Mirpur, Dhaka",
+    teacherName: "Hafez Muhammad Anas",
+    teacherPhone: "01612345678",
+    totalSeats: 60,
+    coursesOffered: "Hifz Program, Quran Recitation, Tajweed",
+    imageUrl: "images/quran4.jpg",
+    mosqueId: null,
+  },
+});
+
 
   // Create students
   await prisma.student.upsert({
@@ -237,48 +292,77 @@ async function main() {
 
   // Create events
   await prisma.event.upsert({
-    where: { id: "seed-event-001" },
-    update: {},
-    create: {
-      id: "seed-event-001",
-      title: "Quran Mahfil",
-      topic: "The Importance of Quran",
-      speaker: "Maulana Abdullah",
-      eventDate: new Date("2026-07-15"),
-      eventTime: "08:00 PM",
-      mosqueId: mosque1.id,
-    },
-  });
+  where: { id: "seed-event-001" },
+  update: {},
+  create: {
+    id: "seed-event-001",
+    title: "Quran Mahfil 2026",
+    topic: "The Importance of Quran in Daily Life",
+    speaker: "Maulana Abdullah Al Faruki",
+    eventDate: new Date("2026-07-15"),
+    eventTime: "08:00 PM",
+    location: "Baitul Mukarram Mosque, Dhaka",
+    description: "Join us for a beautiful Mahfil. Free Quran will be distributed. Biryani will be served after the event.",
+    imageUrl: "images/event1.jpg",
+    isFree: true,
+    mosqueId: mosque1.id,
+  },
+});
 
-  await prisma.event.upsert({
-    where: { id: "seed-event-002" },
-    update: {},
-    create: {
-      id: "seed-event-002",
-      title: "Hadith Conference",
-      topic: "Following the Sunnah of Prophet",
-      speaker: "Dr. Muhammad Saifullah",
-      eventDate: new Date("2026-08-01"),
-      eventTime: "10:00 AM",
-      mosqueId: mosque2.id,
-    },
-  });
+await prisma.event.upsert({
+  where: { id: "seed-event-002" },
+  update: {},
+  create: {
+    id: "seed-event-002",
+    title: "Hadith Conference",
+    topic: "Following the Sunnah of Prophet",
+    speaker: "Dr. Muhammad Saifullah",
+    eventDate: new Date("2026-08-01"),
+    eventTime: "10:00 AM",
+    location: "Star Mosque, Old Dhaka",
+    description: "A grand conference on Hadith sciences. Certificate will be given to participants.",
+    imageUrl: "images/event2.jpg",
+    isFree: true,
+    mosqueId: mosque2.id,
+  },
+});
 
-  await prisma.event.upsert({
-    where: { id: "seed-event-003" },
-    update: {},
-    create: {
-      id: "seed-event-003",
-      title: "Islamic Finance Seminar",
-      topic: "Halal Banking and Investment",
-      speaker: "Professor Abdul Aziz",
-      eventDate: new Date("2026-08-20"),
-      eventTime: "03:00 PM",
-      mosqueId: mosque3.id,
-    },
-  });
+await prisma.event.upsert({
+  where: { id: "seed-event-003" },
+  update: {},
+  create: {
+    id: "seed-event-003",
+    title: "Islamic Finance Seminar",
+    topic: "Halal Banking and Investment",
+    speaker: "Professor Abdul Aziz",
+    eventDate: new Date("2026-08-20"),
+    eventTime: "03:00 PM",
+    location: "Rajshahi City Hall",
+    description: "Learn about halal investment and banking. Entry fee: 200 BDT.",
+    imageUrl: "images/event3.jpg",
+    isFree: false,
+    mosqueId: mosque3.id,
+  },
+});
 
-  console.log("Events created");
+await prisma.event.upsert({
+  where: { id: "seed-event-004" },
+  update: {},
+  create: {
+    id: "seed-event-004",
+    title: "Independent Quran Mahfil",
+    topic: "Love for Quran",
+    speaker: "Maulana Tariq Jameel",
+    eventDate: new Date("2026-07-20"),
+    eventTime: "07:00 PM",
+    location: "Dhaka City College Ground",
+    description: "Open for all. Free entry. Biryani will be served after the Mahfil.",
+    imageUrl: "images/event4.jpg",
+    isFree: true,
+    mosqueId: null,
+  },
+});
+
 
   // Create questions
   const question1 = await prisma.question.upsert({

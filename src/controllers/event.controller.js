@@ -138,3 +138,32 @@ export const deleteEvent = async (req, res) => {
     });
   }
 };
+
+// get Upcoming Event
+export const getUpcomingEvents = async (req, res) => {
+  try {
+    const now = new Date();
+    const events = await prisma.event.findMany({
+      where: {
+        eventDate: { gte: now },
+        status: "upcoming"
+      },
+      orderBy: { eventDate: "asc" },
+      take: 3,
+      include: {
+        mosque: { select: { name: true } }
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      count: events.length,
+      data: events,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

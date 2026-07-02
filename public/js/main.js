@@ -22,6 +22,32 @@ function toggleDark() {
 if (localStorage.getItem("darkMode") === "true") {
   document.body.classList.add("dark");
 }
+// Helper funtion
+function isAdmin() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  return user && user.role === "admin";
+}
+
+async function deleteQuestion(questionId) {
+  if (!confirm("Are you sure you want to delete this question?")) return;
+
+  try {
+    const res = await fetch(`${API}/qa/questions/${questionId}`, {
+      method: "DELETE",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Question deleted!");
+      getAllQuestions();
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    alert("Failed to delete question.");
+  }
+}
 
 // ===== NAVIGATION =====
 function showSection(id) {
@@ -115,7 +141,8 @@ function updateAuthUI() {
 
   if (user) {
     authButtons.innerHTML = `
-      <span class="user-greeting">👤 ${user.name}</span>
+      ${user.role === "admin" ? `<a href="#" class="nav-link" onclick="showSection('admin')">⚙️ Admin</a>` : ""}
+      <a href="#" class="nav-link" onclick="showSection('profile'); loadProfile();">👤 ${user.name}</a>
       <button class="btn-login" onclick="logout()">Logout</button>
       <button class="dark-toggle" onclick="toggleDark()">🌙 Dark</button>
     `;
@@ -126,6 +153,8 @@ function updateAuthUI() {
     `;
   }
 }
+
+
 
 // ===== HOME =====
 async function loadHomeStats() {
@@ -267,21 +296,22 @@ async function loadAllMaktabs() {
   }
 }
 
-async function getMaktabs() {
-  const mosqueId = document.getElementById("mosqueIdInput").value;
-  if (!mosqueId) { alert("Please enter a Mosque ID!"); return; }
+async function searchMaktabByName() {
+  const name = document.getElementById("maktabSearchInput").value;
+  if (!name) { alert("Please enter a name!"); return; }
 
   const div = document.getElementById("maktabResults");
   div.innerHTML = "<p>Searching...</p>";
 
   try {
-    const res = await fetch(`${API}/maktabs/mosque/${mosqueId}`);
+    const res = await fetch(`${API}/maktabs/search/${name}`);
     const data = await res.json();
     displayMaktabs(data.data, div);
   } catch (err) {
     div.innerHTML = "<p>Search failed.</p>";
   }
 }
+
 
 function displayMaktabs(maktabs, div) {
   if (!maktabs || maktabs.length === 0) {
@@ -361,6 +391,43 @@ function displayEvents(events, div) {
 }
 
 // ===== Q&A =====
+async function postQuestion() {
+  if (!token) { alert("Please login to ask a question!"); showSection("login"); return; }
+
+  const title = document.getElementById("questionTitle").value;
+  const body = document.getElementById("questionBody").value;
+  const category = document.getElementById("questionCategory").value;
+
+  if (!title || !body || !category) { alert("Please fill all fields!"); return; }
+
+  try {
+    const res = await fetch(`${API}/qa/questions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ title, body, category }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById("questionTitle").value = "";
+      document.getElementById("questionBody").value = "";
+      document.getElementById("questionCategory").value = "";
+      alert("Question posted successfully!");
+      getAllQuestions();
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    alert("Failed to post question.");
+  }
+}
+
+let allQuestionsData = [];
+let questionsShown = 3;
+
 async function getAllQuestions() {
   const div = document.getElementById("qaResults");
   div.innerHTML = "<p>Loading questions...</p>";
@@ -374,31 +441,105 @@ async function getAllQuestions() {
       return;
     }
 
-    div.innerHTML = data.data.map(q => `
-      <div class="card qa-card">
-        <h3>❓ ${q.title}</h3>
-        <p>${q.body}</p>
-        <p>📂 Category: ${q.category}</p>
-        <p>👤 Asked by: ${q.user?.name}</p>
-        <p>💬 ${q.answers?.length || 0} Answer(s)</p>
-        <span class="card-badge">${q.status}</span>
-        ${q.answers && q.answers.length > 0 ? `
-          <div class="answers">
-            <h4>Answers:</h4>
-            ${q.answers.map(a => `
-              <div class="answer-item">
-                <p>${a.body}</p>
-                ${a.isAccepted ? '<span class="card-badge accepted">✅ Best Answer</span>' : ""}
-              </div>
-            `).join("")}
-          </div>
-        ` : ""}
-      </div>
-    `).join("");
+    allQuestionsData = data.data;
+    questionsShown = 3;
+    renderQuestions();
   } catch (err) {
     div.innerHTML = "<p>Could not load questions.</p>";
   }
 }
+
+function renderQuestions() {
+  const div = document.getElementById("qaResults");
+  const toShow = allQuestionsData.slice(0, questionsShown);
+
+  div.innerHTML = toShow.map(q => {
+    const answers = q.answers || [];
+    const visibleAnswers = answers.slice(0, 2);
+    const hasMore = answers.length > 2;
+
+    return `
+    <div class="card qa-card">
+      <h3>❓ ${q.title}</h3>
+      <p>${q.body}</p>
+      <p>📂 Category: ${q.category}</p>
+      <p>👤 Asked by: ${q.user?.name}</p>
+      <p>💬 ${answers.length} Answer(s)</p>
+      ${isAdmin() ? `<button class="delete-btn" onclick="deleteQuestion('${q.id}')">🗑️ Delete</button>` : ""}
+      ${answers.length > 0 ? `
+        <div class="answers" id="answers-${q.id}">
+          <h4>Answers:</h4>
+          ${visibleAnswers.map(a => `
+            <div class="answer-item">
+              <p>${a.body}</p>
+              ${a.isAccepted ? '<span class="card-badge accepted">✅ Best Answer</span>' : ""}
+            </div>
+          `).join("")}
+        </div>
+        ${hasMore ? `<button class="view-all-btn" onclick="viewAllAnswers('${q.id}')">View All ${answers.length} Answers</button>` : ""}
+      ` : ""}
+      <div class="answer-form">
+        <input type="text" id="answer-${q.id}" placeholder="Write your answer...">
+        <button onclick="postAnswer('${q.id}')">Reply</button>
+      </div>
+    </div>
+  `}).join("");
+
+  if (questionsShown < allQuestionsData.length) {
+    div.innerHTML += `<button class="btn-primary" onclick="loadMoreQuestions()">Load More Questions</button>`;
+  }
+}
+
+function viewAllAnswers(questionId) {
+  const question = allQuestionsData.find(q => q.id === questionId);
+  const answersDiv = document.getElementById(`answers-${questionId}`);
+
+  answersDiv.innerHTML = `
+    <h4>All Answers:</h4>
+    ${question.answers.map(a => `
+      <div class="answer-item">
+        <p>${a.body}</p>
+        ${a.isAccepted ? '<span class="card-badge accepted">✅ Best Answer</span>' : ""}
+      </div>
+    `).join("")}
+  `;
+}
+
+
+function loadMoreQuestions() {
+  questionsShown += 3;
+  renderQuestions();
+}
+
+
+async function postAnswer(questionId) {
+  if (!token) { alert("Please login to answer!"); showSection("login"); return; }
+
+  const body = document.getElementById(`answer-${questionId}`).value;
+  if (!body) { alert("Please write an answer!"); return; }
+
+  try {
+    const res = await fetch(`${API}/qa/questions/${questionId}/answers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ body }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Answer posted!");
+      getAllQuestions();
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    alert("Failed to post answer.");
+  }
+}
+
 
 // ===== PRAYER TIMES =====
 async function loadPrayerTimes() {
@@ -501,6 +642,156 @@ async function fetchRamadanSchedule(city) {
     `;
   } catch (err) {
     div.innerHTML = "<p>Could not load Ramadan schedule. Check your internet connection.</p>";
+  }
+}
+
+// ===== PROFILE =====
+async function loadProfile() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) { showSection("login"); return; }
+
+  document.getElementById("profileName").value = user.name;
+  document.getElementById("profileEmail").value = user.email;
+}
+
+async function updateProfile() {
+  const name = document.getElementById("profileName").value;
+  const email = document.getElementById("profileEmail").value;
+  const password = document.getElementById("profilePassword").value;
+
+  const body = {};
+  if (name) body.name = name;
+  if (email) body.email = email;
+  if (password) body.password = password;
+
+  try {
+    const res = await fetch(`${API}/auth/update-profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem("user", JSON.stringify(data.data));
+      updateAuthUI();
+      document.getElementById("profilePassword").value = "";
+      alert("Profile updated successfully!");
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    alert("Update failed. Please try again.");
+  }
+}
+// ===== ADMIN =====
+function showAdminTab(tabId) {
+  document.querySelectorAll(".admin-tab-content").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active"));
+  document.getElementById(tabId).classList.add("active");
+  event.target.classList.add("active");
+}
+
+async function adminAddMosque() {
+  const body = {
+    name: document.getElementById("m_name").value,
+    address: document.getElementById("m_address").value,
+    region: document.getElementById("m_region").value,
+    imamName: document.getElementById("m_imam").value,
+    muazzinName: document.getElementById("m_muazzin").value,
+    imageUrl: document.getElementById("m_image").value,
+    latitude: parseFloat(document.getElementById("m_lat").value) || null,
+    longitude: parseFloat(document.getElementById("m_lng").value) || null,
+  };
+
+  if (!body.name || !body.address || !body.region) { alert("Name, address and region are required!"); return; }
+
+  try {
+    const res = await fetch(`${API}/mosques`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Mosque added successfully!");
+      document.querySelectorAll("#addMosqueTab input").forEach(i => i.value = "");
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    alert("Failed to add mosque.");
+  }
+}
+
+async function adminAddMaktab() {
+  const body = {
+    name: document.getElementById("mk_name").value,
+    address: document.getElementById("mk_address").value,
+    teacherName: document.getElementById("mk_teacher").value,
+    teacherPhone: document.getElementById("mk_phone").value,
+    totalSeats: parseInt(document.getElementById("mk_seats").value),
+    coursesOffered: document.getElementById("mk_courses").value,
+    imageUrl: document.getElementById("mk_image").value,
+    mosqueId: document.getElementById("mk_mosqueId").value || null,
+  };
+
+  if (!body.name || !body.teacherName || !body.teacherPhone || !body.totalSeats) { alert("Name, teacherName, phone and seats are required!"); return; }
+
+  try {
+    const res = await fetch(`${API}/maktabs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Maktab added successfully!");
+      document.querySelectorAll("#addMaktabTab input").forEach(i => i.value = "");
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    alert("Failed to add maktab.");
+  }
+}
+
+async function adminAddEvent() {
+  const body = {
+    title: document.getElementById("e_title").value,
+    topic: document.getElementById("e_topic").value,
+    speaker: document.getElementById("e_speaker").value,
+    eventDate: document.getElementById("e_date").value,
+    eventTime: document.getElementById("e_time").value,
+    location: document.getElementById("e_location").value,
+    description: document.getElementById("e_description").value,
+    imageUrl: document.getElementById("e_image").value,
+    mosqueId: document.getElementById("e_mosqueId").value || null,
+  };
+
+  if (!body.title || !body.topic || !body.speaker || !body.eventDate || !body.eventTime) { alert("Title, topic, speaker, date and time are required!"); return; }
+
+  try {
+    const res = await fetch(`${API}/events`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Event added successfully!");
+      document.querySelectorAll("#addEventTab input").forEach(i => i.value = "");
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    alert("Failed to add event.");
   }
 }
 

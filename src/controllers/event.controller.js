@@ -56,7 +56,12 @@ export const getEventsByRegion = async (req, res) => {
 
     const events = await prisma.event.findMany({
       where: {
-        mosque: { region },
+        mosque: { 
+          region: {
+            contains: region,
+            mode: "insensitive"
+          }
+         },
       },
       include: {
         mosque: { select: { name: true, address: true, region: true } },

@@ -3,6 +3,7 @@ import {
   addMaktab,
   getMaktabsByMosque,
   getAllMaktabs,
+  searchMaktab,
   enrollStudent,
   getStudentsByMaktab,
   addFunding,
@@ -16,6 +17,7 @@ const router = express.Router();
 router.post("/", protect, adminOnly, validateAddMaktab, addMaktab);
 router.get("/mosque/:mosqueId", getMaktabsByMosque);
 router.get("/", getAllMaktabs);
+router.get("/search/:name", searchMaktab),
 router.post("/:maktabId/students", protect, adminOnly, validateEnrollStudent, enrollStudent);
 router.get("/:maktabId/students", getStudentsByMaktab);
 router.post("/:maktabId/funding", protect, validateAddFunding, addFunding);
